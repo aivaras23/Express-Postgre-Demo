@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "test": "newman run Express-json-collection.postman_collection.json"
   },
   "keywords": [],
   "author": "Aivaras (https://github.com/aivaras23)",
   "license": "ISC",
   "devDependencies": {
+    "newman": "^6.2.1",
     "nodemon": "^3.1.4"
   },
   "dependencies": {
