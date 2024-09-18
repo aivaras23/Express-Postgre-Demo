@@ -1,49 +1,42 @@
 {
 	"info": {
-		"_postman_id": "b49cb525-d73c-4ed7-b0b4-4305a53c07d3",
+		"_postman_id": "313cb7ee-32d2-4ddf-8674-984b01c89aa9",
 		"name": "Express-json-collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "38049165"
+		"_exporter_id": "7556965"
 	},
 	"item": [
 		{
-			"name": "Create Actor Functionality",
+			"name": "Create Actor functionality",
 			"item": [
 				{
-					"name": "Create Actor successful call",
+					"name": "Cannot create actor which has future birth date",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"const moment = require('moment');\r",
-									"const responseJson = pm.response.json();\r",
+									"// Check if 400 is returned\r",
 									"\r",
-									"// Store actorId for future requests\r",
-									"pm.collectionVariables.set('actorId', responseJson.id);\r",
-									"\r",
-									"// Test for correct status code (expect 201 instead of 200)\r",
-									"pm.test('Response status is 201', () => {\r",
-									"    pm.expect(pm.response.code).to.eql(201);\r",
+									"// Check if  string 'Date of birth cannot be in the future' is returned\r",
+									"// Check if 400 is returned\r",
+									"pm.test(\"Response status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
 									"});\r",
 									"\r",
-									"// Test that the actor details match the expected values\r",
-									"pm.test('Check that id, first and last name, and date of birth are correct', () => {\r",
-									"    pm.expect(responseJson.id).to.eql(pm.collectionVariables.get('actorId'));\r",
-									"\r",
-									"    // Double-check the exact keys used in the response (could be first_name instead of firstName)\r",
-									"    pm.expect(responseJson.first_name).to.eql('Jane');\r",
-									"    pm.expect(responseJson.last_name).to.eql('Doe');\r",
-									"\r",
-									"    // Use moment.js to convert the date to local time\r",
-									"    const dateOfBirth = moment(responseJson.date_of_birth).format('YYYY-MM-DD');\r",
-									"    pm.expect(dateOfBirth).to.eql('2000-01-01');\r",
-									"});\r",
-									"\r",
-									"// Test that the response time is under 2 seconds\r",
-									"pm.test('Response time is less than 2 seconds', () => {\r",
-									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
-									"});\r",
+									"// Check if  string 'Date of birth cannot be in the future' is returned\r",
+									"pm.test(\"Response body contains the error message\", function () {\r",
+									"    pm.expect(pm.response.text()).to.eq('Date of birth cannot be in the future');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
 									""
 								],
 								"type": "text/javascript",
@@ -56,55 +49,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"firstName\": \"Jane\",\r\n    \"lastName\": \"Doe\",\r\n    \"dateOfBirth\": \"2000-01-01\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3000/actors/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"actors",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Cannot create actor which has future birth date",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 400\", function () {\r",
-									"    pm.response.to.have.status(400);  // Check if the status code is 400\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Error message is correct\", function () {\r",
-									"    const responseJson = pm.response.json();  // Parse the response body as JSON\r",
-									"    pm.expect(responseJson.message).to.eql(\"Date of birth cannot be in the future\");  \r",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"firstName\": \"John\",\r\n    \"lastName\": \"Doe\",\r\n    \"dateOfBirth\": \"2030-01-01\"\r\n}",
+							"raw": "{\r\n    \"firstName\": \"errr\", \r\n    \"lastName\": \"Pinelis\", \r\n    \"dateOfBirth\": \"2030-02-14\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -126,103 +71,54 @@
 					"response": []
 				},
 				{
-					"name": "Check created actor exists in get all",
-					"request": {
-						"method": "GET",
-						"header": []
-					},
-					"response": []
-				},
-				{
-					"name": "Check created actor exists in get by id",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);  \r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response is as expected\", function () {\r",
-									"    const jsonData = pm.response.json();\r",
-									"\r",
-									"    pm.expect(jsonData).to.have.property(\"id\").this.is.a('number');\r",
-									"    pm.expect(jsonData).to.have.property(\"first_name\").that.is.a('string');\r",
-									"    pm.expect(jsonData).to.have.property(\"last_name\").that.is.a('string');\r",
-									"    pm.expect(jsonData).to.have.property(\"date_of_birth\").that.is.a('string');\r",
-									"    pm.expect(jsonData).to.have.property(\"created_at\").that.is.a('string');\r",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/actors/{{actorId}}",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"actors",
-								"{{actorId}}"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Delete Functionality",
-			"item": [
-				{
-					"name": "Deleting Actor which does not exist return 404",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/actors/1000000",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"actors",
-								"1000000"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Actor for further delete",
+					"name": "Create Actor Successfull call",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
 									"const responseJson = pm.response.json()\r",
+									" \r",
+									"var requestBody = pm.request.body.raw;\r",
+									"// Parse the request body string as JSON\r",
+									"var requestJson = JSON.parse(requestBody);\r",
 									"\r",
-									"pm.collectionVariables.set('actorId', responseJson.id)\r",
+									"pm.collectionVariables.set(\"actorId\", responseJson.id)\r",
 									"\r",
-									"pm.test('Check that id, first and last name, date of birth and responde code are correct'), () => {\r",
-									"    const responseObject = pm.response.json();\r",
+									"pm.collectionVariables.set(\"actorFirstName\", requestJson.firstName)\r",
+									"pm.collectionVariables.set(\"actorLastName\", requestJson.lastName)\r",
 									"\r",
-									"    pm.expect(responseObject.id).to.eq(pm.variables.get('actordId'));\r",
-									"    pm.expect(responseObject.first_name).to.eq('John');\r",
-									"    pm.expect(responseObject.last_name).to.eq('Doe');\r",
-									"    pm.expect(responseObject.date_of_birth).to.eq('2000-01-01');\r",
-									"    pm.expect(pm.response.code).to.eq(200);\r",
-									"}"
+									"\r",
+									"pm.test(\"Check that first and last names are correct\",  () => {\r",
+									"     pm.expect(responseJson.id).to.be.a('number').and.be.above(0);\r",
+									"     pm.expect(responseJson.first_name).to.eq(requestJson.firstName);\r",
+									"     pm.expect(responseJson.last_name).to.eq(requestJson.lastName);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Created_at is in a valid date format\", () => {\r",
+									"    pm.expect(responseJson.created_at).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/, \"Invalid date format\");\r",
+									"});\r",
+									"pm.test(\"Response status code is 201\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 1s\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -234,7 +130,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"firstName\": \"Test\",\r\n    \"lastName\": \"Test\",\r\n    \"dateOfBirth\": \"1990-09-09\"\r\n}",
+							"raw": "{\r\n    \"firstName\": \"gffdgfd\", \r\n    \"lastName\": \"fdsfdsfds\", \r\n    \"dateOfBirth\": \"1990-02-14\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -242,107 +138,14 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/actors/",
+							"raw": "http://localhost:3000/actors",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "3000",
 							"path": [
-								"actors",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Actor which does exist return 204",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 204\", function () {\r",
-									"    pm.response.to.have.status(204);  // Check if the status code is 400\r",
-									"});\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/actors/{{actorId}}",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"actors",
-								"{{actorId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Check created actor exists in get all",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200); \r",
-									"});\r",
-									"\r",
-									"\r",
-									"pm.test(\"Response contains a list of users with the expected fields\", function () {\r",
-									"    const jsonData = pm.response.json();\r",
-									"\r",
-									"    // Check if the response is an array\r",
-									"    pm.expect(jsonData).to.be.an('array');\r",
-									"\r",
-									"    // Loop through each user in the array\r",
-									"    jsonData.forEach(function(user) {\r",
-									"        // Check if the user object contains the expected fields\r",
-									"        pm.expect(user).to.have.property('id').that.is.a('number');\r",
-									"        pm.expect(user).to.have.property('first_name').that.is.a('string');\r",
-									"        pm.expect(user).to.have.property('last_name').that.is.a('string');\r",
-									"        pm.expect(user).to.have.property('date_of_birth').that.is.a('string');\r",
-									"        pm.expect(user).to.have.property('created_at').that.is.a('string');\r",
-									"    });\r",
-									"});\r",
-									"\r",
-									"pm.test('Response time is less than 2 seconds', () => {\r",
-									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/actors/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"actors",
-								""
+								"actors"
 							]
 						}
 					},
@@ -355,23 +158,27 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);  \r",
+									"// Status is 200\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
+									"// First_name is a string and last_name is a string\r",
+									"pm.test(\"first_name and last_name match input\", function () {\r",
+									"  var responseData = pm.response.json();\r",
 									"\r",
-									"pm.test(\"Response is as expected\", function () {\r",
-									"    const jsonData = pm.response.json();\r",
+									"  firstName = pm.collectionVariables.get(\"actorFirstName\")\r",
+									"  lastName = pm.collectionVariables.get(\"actorLastName\")\r",
 									"\r",
-									"    pm.expect(jsonData).to.have.property(\"id\").is.a('number');\r",
-									"    pm.expect(jsonData).to.have.property(\"first_name\").that.is.a('string');\r",
-									"    pm.expect(jsonData).to.have.property(\"last_name\").that.is.a('string');\r",
-									"    pm.expect(jsonData).to.have.property(\"date_of_birth\").that.is.a('string');\r",
-									"    pm.expect(jsonData).to.have.property(\"created_at\").that.is.a('string');\r",
+									"  pm.expect(responseData.first_name).to.be.eq(firstName);\r",
+									"  pm.expect(responseData.last_name).to.be.eq(lastName);\r",
 									"});\r",
 									"\r",
-									"pm.test('Response time is less than 2 seconds', () => {\r",
-									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"// date_of_birth and created_at are present and not empty\r",
+									"pm.test(\"date_of_birth and created_at are present and not empty\", function () {\r",
+									"  var responseData = pm.response.json();\r",
+									"  pm.expect(responseData).to.have.property('date_of_birth').that.is.not.empty;\r",
+									"  pm.expect(responseData).to.have.property('created_at').that.is.not.empty;\r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -398,19 +205,31 @@
 					"response": []
 				},
 				{
-					"name": "Delete Actor by an ID",
+					"name": "Check created actor exists in Getall",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 204\", function () {\r",
-									"    pm.response.to.have.status(204);  // Check if the status code is 400\r",
+									"// Status is 200\r",
+									"\r",
+									"// the array contains first_name 'jaunius' and last_name 'pinelis'\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test('Response time is less than 2 seconds', () => {\r",
-									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
-									"});"
+									"pm.test(\"Check if array contains first_name 'Jaunius' and last_name 'Pinelis'\", function () {\r",
+									"    var actorId = pm.collectionVariables.get(\"actorId\")\r",
+									"    firstName = pm.collectionVariables.get(\"actorFirstName\")\r",
+									"    lastName = pm.collectionVariables.get(\"actorLastName\")\r",
+									"\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var found = jsonData.some(function(item) {\r",
+									"        return item.first_name === firstName && item.last_name === lastName && item.id == actorId;\r",
+									"    });\r",
+									"    pm.expect(found).to.be.true;\r",
+									"});\r",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -418,10 +237,10 @@
 						}
 					],
 					"request": {
-						"method": "DELETE",
+						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/actors/30",
+							"raw": "http://localhost:3000/actors/",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -429,7 +248,7 @@
 							"port": "3000",
 							"path": [
 								"actors",
-								"30"
+								""
 							]
 						}
 					},
@@ -438,28 +257,245 @@
 			]
 		},
 		{
-			"name": "Update Actor Functionality",
+			"name": "Delete Functionality",
 			"item": [
 				{
-					"name": "Update Actor successful call",
+					"name": "Deleting Customer which does exist return 404",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actors/100000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actors",
+								"100000"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Actor for further delete",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Jaunius\", \r\n    \"lastName\": \"Pinelis\", \r\n    \"dateOfBirth\": \"1990-01-14\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/actors",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deleting Customer which does exist return 404 Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actors/7",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actors",
+								"7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check deleted actor does not exists in get by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actors/7",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actors",
+								"7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check deleted actor does not exist in Getall",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actors",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actors"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update Actor functionality",
+			"item": [
+				{
+					"name": "Create Actor Successfull call",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
 									"const responseJson = pm.response.json()\r",
+									" \r",
+									"var requestBody = pm.request.body.raw;\r",
+									"// Parse the request body string as JSON\r",
+									"var requestJson = JSON.parse(requestBody);\r",
 									"\r",
-									"pm.collectionVariables.set('actorId', responseJson.id)\r",
+									"pm.collectionVariables.set(\"actorId\", responseJson.id)\r",
 									"\r",
-									"pm.test('Check that id, first and last name, date of birth and responde code are correct'), () => {\r",
-									"    const responseObject = pm.response.json();\r",
+									"pm.test(\"Check that first and last names are correct\",  () => {\r",
+									"     pm.expect(responseJson.id).to.be.a('number').and.be.above(0);\r",
+									"     pm.expect(responseJson.first_name).to.eq(requestJson.firstName);\r",
+									"     pm.expect(responseJson.last_name).to.eq(requestJson.lastName);\r",
+									"});\r",
 									"\r",
-									"    pm.expect(responseObject.id).to.eq(pm.variables.get('actordId'));\r",
-									"    pm.expect(responseObject.first_name).to.eq('Test');\r",
-									"    pm.expect(responseObject.last_name).to.eq('Test');\r",
-									"    pm.expect(responseObject.date_of_birth).to.eq('1990-09-08');\r",
-									"    pm.expect(pm.response.code).to.eq(200);\r",
-									"}"
+									"pm.test(\"Created_at is in a valid date format\", () => {\r",
+									"    pm.expect(responseJson.created_at).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/, \"Invalid date format\");\r",
+									"});\r",
+									"pm.test(\"Response status code is 201\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 1s\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"gffdgfd\", \r\n    \"lastName\": \"fdsfdsfds\", \r\n    \"dateOfBirth\": \"1990-01-14\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/actors",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Actor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json()\r",
+									" \r",
+									"var requestBody = pm.request.body.raw;\r",
+									"// Parse the request body string as JSON\r",
+									"var requestJson = JSON.parse(requestBody);\r",
+									"\r",
+									"pm.collectionVariables.set(\"actorFirstName\", requestJson.firstName)\r",
+									"pm.collectionVariables.set(\"actorLastName\", requestJson.lastName)\r",
+									"\r",
+									"\r",
+									"pm.test(\"Check that first and last names are correct\",  () => {\r",
+									"     const actorId = pm.collectionVariables.get(\"actorId\");\r",
+									"     pm.expect(responseJson.id.toString()).to.eq(actorId)\r",
+									"     pm.expect(responseJson.first_name).to.eq(requestJson.firstName);\r",
+									"     pm.expect(responseJson.last_name).to.eq(requestJson.lastName);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Created_at is in a valid date format\", () => {\r",
+									"    pm.expect(responseJson.created_at).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/, \"Invalid date format\");\r",
+									"});\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is less than 1s\", function () {\r",
+									"  pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -471,7 +507,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"firstName\": \"Test\",\r\n    \"lastName\": \"Test\",\r\n    \"dateOfBirth\": \"1990-09-01\"\r\n}",
+							"raw": "{\r\n    \"firstName\": \"Jaunius-Updated2\", \r\n    \"lastName\": \"Pinelis-Updated\", \r\n    \"dateOfBirth\": \"1992-01-14\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -488,6 +524,109 @@
 							"path": [
 								"actors",
 								"{{actorId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Updated actor in get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Status is 200\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// First_name is a string and last_name is a string\r",
+									"pm.test(\"first_name and last_name match update request info\", function () {\r",
+									"  var responseData = pm.response.json();\r",
+									"\r",
+									"  firstName = pm.collectionVariables.get(\"actorFirstName\")\r",
+									"  lastName = pm.collectionVariables.get(\"actorLastName\")\r",
+									"\r",
+									"  pm.expect(responseData.first_name).to.be.eq(firstName);\r",
+									"  pm.expect(responseData.last_name).to.be.eq(lastName);\r",
+									"});\r",
+									"\r",
+									"// date_of_birth and created_at are present and not empty\r",
+									"pm.test(\"date_of_birth and created_at are present and not empty\", function () {\r",
+									"  var responseData = pm.response.json();\r",
+									"  pm.expect(responseData).to.have.property('date_of_birth').that.is.not.empty;\r",
+									"  pm.expect(responseData).to.have.property('created_at').that.is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actors/{{actorId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actors",
+								"{{actorId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check updated actor in Getall",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Status is 200\r",
+									"\r",
+									"// the array contains first_name 'jaunius' and last_name 'pinelis'\r",
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if array contains update request info\", function () {\r",
+									"    var actorId = pm.collectionVariables.get(\"actorId\")\r",
+									"    firstName = pm.collectionVariables.get(\"actorFirstName\")\r",
+									"    lastName = pm.collectionVariables.get(\"actorLastName\")\r",
+									"\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var found = jsonData.some(function(item) {\r",
+									"        return item.first_name === firstName && item.last_name === lastName && item.id == actorId;\r",
+									"    });\r",
+									"    pm.expect(found).to.be.true;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/actors/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"actors",
+								""
 							]
 						}
 					},
@@ -511,14 +650,6 @@
 						"actors"
 					]
 				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Actor by an ID",
-			"request": {
-				"method": "GET",
-				"header": []
 			},
 			"response": []
 		}
@@ -548,8 +679,16 @@
 	"variable": [
 		{
 			"key": "actorId",
-			"value": "1",
+			"value": "4",
 			"type": "string"
+		},
+		{
+			"key": "actorFirstName",
+			"value": ""
+		},
+		{
+			"key": "actorLastName",
+			"value": ""
 		}
 	]
 }
